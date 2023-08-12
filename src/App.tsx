@@ -1,13 +1,11 @@
-import './App.css'
+import RegisterPage from "./Pages/register"
 
-function App() {
-
-
-  return (
-    <div className='app'>
-      <h1>Aawokwowkowko</h1>
-    </div>
-  )
+const App = () => {
+    return (
+        <div className="flex justify-center min-h-screen items-center">
+            <RegisterPage />
+        </div>
+    )
 }
 
 export default App
