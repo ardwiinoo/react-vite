@@ -1,5 +1,5 @@
-import InputForm from './../Elements/Input/index';
-import Button from './../Elements/Button/index';
+import InputForm from '../Elements/Input/index';
+import Button from '../Elements/Button/index';
 
 const FormLogin = () => {
     return (
