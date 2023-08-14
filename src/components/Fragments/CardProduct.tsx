@@ -6,7 +6,7 @@ interface Props {
 
 const CardProduct = (props: Props) => {
     return (
-        <div className="w-full max-w-sm bg-gray-800 border border-gray-700 rounded-lg shadow mx-2 flex flex-col justify-between">
+        <div className="w-full max-w-sm bg-gray-800 border border-gray-700 rounded-lg shadow mx-2 flex flex-col justify-between my-2">
             {props.children}
         </div>
     )
@@ -48,15 +48,16 @@ const Body = (props: BodyProps) => {
 }
 
 interface FooterProps {
-    price: string
+    price: number
+    addToCart?: () => void
 }
 
 const Footer = (props: FooterProps) => {
     return (
         <div className="flex items-center justify-between px-5 pb-5">
-            <span className="text-xl font-bold text-white">Rp. {props.price}</span>
+            <span className="text-xl font-bold text-white">{props.price.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</span>
             <div className="w-15">
-                <Button title="Add to Cart" variant="bg-blue-600"/>
+                <Button title="Add to Cart" variant="bg-blue-600" onClick={props.addToCart}/>
             </div>
         </div>
     )
