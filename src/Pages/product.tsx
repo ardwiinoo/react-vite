@@ -1,30 +1,32 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Button from "../components/Elements/Button"
 import CardProduct from "../components/Fragments/CardProduct"
+import { getProducts } from "../services/product.service"
+import ProductResponses from "../interfaces/ProductResponses"
 
-const products = [
-    {
-        id: 1,
-        image: "/images/laptop.jpg",
-        title: "Laptop",
-        price: 5000000,
-        description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quasi, laudantium pariatur beatae quibusdam similique nisi"
-    },
-    {
-        id: 2,
-        image: "/images/laptop.jpg",
-        title: "Laptop Gimang",
-        price: 10000000,
-        description: "Lorem ipsum dolor sit amet, beatae quibusdam similique nisi"
-    },
-    {
-        id: 3,
-        image: "/images/laptop.jpg",
-        title: "Laptop Dingin",
-        price: 2000000,
-        description: "Lorem ipsum dolor sit amet, beatae quibusdam similique nisi, Quasi, laudantium pariatur beatae quibusdam similique nisi"
-    },
-]
+// const products = [
+//     {
+//         id: 1,
+//         image: "/images/laptop.jpg",
+//         title: "Laptop",
+//         price: 5000000,
+//         description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quasi, laudantium pariatur beatae quibusdam similique nisi"
+//     },
+//     {
+//         id: 2,
+//         image: "/images/laptop.jpg",
+//         title: "Laptop Gimang",
+//         price: 10000000,
+//         description: "Lorem ipsum dolor sit amet, beatae quibusdam similique nisi"
+//     },
+//     {
+//         id: 3,
+//         image: "/images/laptop.jpg",
+//         title: "Laptop Dingin",
+//         price: 2000000,
+//         description: "Lorem ipsum dolor sit amet, beatae quibusdam similique nisi, Quasi, laudantium pariatur beatae quibusdam similique nisi"
+//     },
+// ]
 
 const email = localStorage.getItem('email')
 
@@ -36,16 +38,23 @@ interface InitialCart {
 const ProductPage = () => {
     // Hooks
     const [cart, setCart] = useState<InitialCart[]>([])
+    const [products, setProducts] = useState<ProductResponses[]>([])
     const [totalPrice, setTotalPrice] = useState(0)
 
     useEffect(() => {
-
         // pura pura fetch db
         setCart(JSON.parse(localStorage.getItem("cart") || '[]'))
     }, [])
 
     useEffect(() => {
-        if(cart.length > 0) {
+        // fetch db beneran
+        getProducts((data: ProductResponses[]) => {
+            setProducts(data)
+        })
+    }, [])
+
+    useEffect(() => {
+        if(products.length > 0 && cart.length > 0) {
             const sum = cart.reduce((acc, item) => {
                 const product = products.find((product) => product.id === item.id) 
                 return acc + product!.price * item.qty
@@ -56,7 +65,7 @@ const ProductPage = () => {
             // pura pura db
             localStorage.setItem("cart", JSON.stringify(cart))
         }
-    }, [cart])
+    }, [cart, products])
     
 
     const handleLogout = () => {
@@ -77,6 +86,25 @@ const ProductPage = () => {
         }
     }
 
+    // useRef
+    // const cartRef = useRef(JSON.parse(localStorage.getItem("cart")) || [])
+
+    // const handleAddToCartRef = (id: number) => {
+    //     cartRef.current = [...cartRef.current, {id, qty: 1}]
+    //     localStorage.setItem("cart", JSON.stringify(cartRef.current))
+    // }
+
+    const totalPriceRef = useRef<HTMLTableRowElement>(null)
+    console.log(totalPriceRef)
+
+    useEffect(() => {
+        if(cart.length > 0 && totalPriceRef.current) {
+            totalPriceRef.current.style.display = "table-row"
+        } else if (totalPriceRef.current) {
+            totalPriceRef.current.style.display = "none"
+        }
+    }, [cart])
+
     return (
         <>
             <div className="flex justify-end h-10 bg-blue-600 text-white items-center px-10 py-6">
@@ -88,7 +116,7 @@ const ProductPage = () => {
             <div className="flex justify-center py-5">
                 {/* Rendering List */}
                 <div className="w-4/6 flex flex-wrap">
-                    {products.map((item) => (
+                    {products.length > 0 && products.map((item) => (
                         <CardProduct key={item.id}>
                             <CardProduct.Header image={item.image} />
                             <CardProduct.Body title={item.title}>
@@ -110,7 +138,7 @@ const ProductPage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {cart.map((item) => {
+                            {products.length > 0 && cart.map((item) => {
                                 const product = products.find((product) => product.id === item.id)
                                 return (
                                     <tr key={item.id}>
@@ -118,25 +146,25 @@ const ProductPage = () => {
                                         <td>
                                             {product!.price.toLocaleString('id-ID', {
                                                 style: 'currency', 
-                                                currency: 'IDR'
+                                                currency: 'USD'
                                             })}
                                         </td>
                                         <td>{item.qty}</td>
                                         <td>
                                             {(item.qty * product!.price).toLocaleString('id-ID', { 
                                                 style: 'currency', 
-                                                currency: 'IDR' 
+                                                currency: 'USD' 
                                             })}
                                         </td>
                                     </tr>
                                 )
                             })}
-                            <tr>
+                            <tr ref={totalPriceRef}>
                                 <td colSpan={3}><b>Total Price</b></td>
                                 <td>
                                     <b>{totalPrice.toLocaleString('id-ID', {
                                         style: 'currency', 
-                                        currency: 'IDR'
+                                        currency: 'USD'
                                     })}</b>
                                 </td>
                             </tr>
