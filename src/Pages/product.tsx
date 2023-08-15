@@ -3,6 +3,8 @@ import Button from "../components/Elements/Button"
 import CardProduct from "../components/Fragments/CardProduct"
 import { getProducts } from "../services/product.service"
 import ProductResponses from "../interfaces/ProductResponses"
+import { getUserName } from "../services/auth.service"
+import { useLogin } from "../hooks/useLogin"
 
 // const products = [
 //     {
@@ -28,8 +30,6 @@ import ProductResponses from "../interfaces/ProductResponses"
 //     },
 // ]
 
-const email = localStorage.getItem('email')
-
 interface InitialCart {
     id: number,
     qty: number
@@ -53,6 +53,9 @@ const ProductPage = () => {
         })
     }, [])
 
+    // custom hooks
+    const username = useLogin()
+
     useEffect(() => {
         if(products.length > 0 && cart.length > 0) {
             const sum = cart.reduce((acc, item) => {
@@ -69,8 +72,7 @@ const ProductPage = () => {
     
 
     const handleLogout = () => {
-        localStorage.removeItem('email')
-        localStorage.removeItem('password')
+        localStorage.removeItem('token')
 
         window.location.href = '/login'
     }
@@ -108,7 +110,7 @@ const ProductPage = () => {
     return (
         <>
             <div className="flex justify-end h-10 bg-blue-600 text-white items-center px-10 py-6">
-                {email}
+                {username}
                 <div className="w-200 ml-5">
                     <Button title="Logout" variant="bg-black" onClick={handleLogout}></Button>
                 </div>
