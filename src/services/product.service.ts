@@ -10,3 +10,13 @@ export const getProducts = (callback: (data: ProductResponses[]) => void) => {
             console.log(err)
         })
 }
+
+export const getDetailProduct = (id: string, callback: (data: ProductResponses) => void) => {
+    axios.get(`https://fakestoreapi.com/products/${id}`)
+        .then((res) => {
+            callback(res.data)
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+}
