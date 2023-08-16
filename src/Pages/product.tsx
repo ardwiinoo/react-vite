@@ -3,7 +3,6 @@ import Button from "../components/Elements/Button"
 import CardProduct from "../components/Fragments/CardProduct"
 import { getProducts } from "../services/product.service"
 import ProductResponses from "../interfaces/ProductResponses"
-import { getUserName } from "../services/auth.service"
 import { useLogin } from "../hooks/useLogin"
 
 // const products = [
@@ -120,7 +119,7 @@ const ProductPage = () => {
                 <div className="w-4/6 flex flex-wrap">
                     {products.length > 0 && products.map((item) => (
                         <CardProduct key={item.id}>
-                            <CardProduct.Header image={item.image} />
+                            <CardProduct.Header image={item.image} id={item.id} />
                             <CardProduct.Body title={item.title}>
                                 {item.description}
                             </CardProduct.Body>
