@@ -1,3 +1,4 @@
+import Navbar from "../components/Layouts/Navbar"
 import { useLogin } from "../hooks/useLogin"
 
 const ProfilePage = () => {
@@ -6,6 +7,7 @@ const ProfilePage = () => {
 
     return (
         <div>
+            <Navbar />
             <h1>Profile {username} </h1>
         </div>
     )
