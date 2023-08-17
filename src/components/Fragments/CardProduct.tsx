@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom"
 import Button from "../Elements/Button"
 
+// redux
+import { useDispatch } from "react-redux"
+import { addToCart } from "../../redux/slices/cartSlices"
+
+
 interface Props {
     children: React.ReactNode
 }
@@ -50,16 +55,20 @@ const Body = (props: BodyProps) => {
 }
 
 interface FooterProps {
+    id: number,
     price: number
     addToCart?: () => void
 }
 
 const Footer = (props: FooterProps) => {
+
+    const dispatch = useDispatch()
+
     return (
         <div className="flex items-center justify-between px-5 pb-5">
             <span className="text-xl font-bold text-white">{props.price.toLocaleString('id-ID', { style: 'currency', currency: 'USD' })}</span>
             <div className="w-15">
-                <Button title="Add to Cart" variant="bg-blue-600" onClick={props.addToCart}/>
+                <Button title="Add to Cart" variant="bg-blue-600" onClick={() => dispatch(addToCart({ id: props.id, qty: 1}))}/>
             </div>
         </div>
     )
