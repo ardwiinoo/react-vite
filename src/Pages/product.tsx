@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react"
-import Button from "../components/Elements/Button"
+import { useContext, useEffect, useState } from "react"
 import CardProduct from "../components/Fragments/CardProduct"
 import { getProducts } from "../services/product.service"
 import ProductResponses from "../interfaces/ProductResponses"
 import { useLogin } from "../hooks/useLogin"
+import TableCart from "../components/Fragments/TableCart"
+import Navbar from "../components/Layouts/Navbar"
+import { DarkMode } from "../context/DarkMode"
 
 // const products = [
 //     {
@@ -31,14 +33,16 @@ import { useLogin } from "../hooks/useLogin"
 
 interface InitialCart {
     id: number,
-    qty: number
+    qty: number,
 }
 
 const ProductPage = () => {
+    // useContext
+    const {isDarkMode, setIsDarkMode} = useContext(DarkMode)
+
     // Hooks
     const [cart, setCart] = useState<InitialCart[]>([])
     const [products, setProducts] = useState<ProductResponses[]>([])
-    const [totalPrice, setTotalPrice] = useState(0)
 
     useEffect(() => {
         // pura pura fetch db
@@ -53,28 +57,7 @@ const ProductPage = () => {
     }, [])
 
     // custom hooks
-    const username = useLogin()
-
-    useEffect(() => {
-        if(products.length > 0 && cart.length > 0) {
-            const sum = cart.reduce((acc, item) => {
-                const product = products.find((product) => product.id === item.id) 
-                return acc + product!.price * item.qty
-            }, 0)
-
-            setTotalPrice(sum)
-
-            // pura pura db
-            localStorage.setItem("cart", JSON.stringify(cart))
-        }
-    }, [cart, products])
-    
-
-    const handleLogout = () => {
-        localStorage.removeItem('token')
-
-        window.location.href = '/login'
-    }
+    useLogin()
 
     const handleAddToCart = (id: number) => {
         // cek dulu id 
@@ -95,26 +78,10 @@ const ProductPage = () => {
     //     localStorage.setItem("cart", JSON.stringify(cartRef.current))
     // }
 
-    const totalPriceRef = useRef<HTMLTableRowElement>(null)
-    console.log(totalPriceRef)
-
-    useEffect(() => {
-        if(cart.length > 0 && totalPriceRef.current) {
-            totalPriceRef.current.style.display = "table-row"
-        } else if (totalPriceRef.current) {
-            totalPriceRef.current.style.display = "none"
-        }
-    }, [cart])
-
     return (
         <>
-            <div className="flex justify-end h-10 bg-blue-600 text-white items-center px-10 py-6">
-                {username}
-                <div className="w-200 ml-5">
-                    <Button title="Logout" variant="bg-black" onClick={handleLogout}></Button>
-                </div>
-            </div>
-            <div className="flex justify-center py-5">
+            <Navbar />
+            <div className={`flex justify-center py-5 ${isDarkMode && 'bg-slate-900'}`}>
                 {/* Rendering List */}
                 <div className="w-4/6 flex flex-wrap">
                     {products.length > 0 && products.map((item) => (
@@ -123,54 +90,13 @@ const ProductPage = () => {
                             <CardProduct.Body title={item.title}>
                                 {item.description}
                             </CardProduct.Body>
-                            <CardProduct.Footer price={item.price} addToCart={() => handleAddToCart(item.id)}/>
+                            <CardProduct.Footer price={item.price} id={item.id} addToCart={() => handleAddToCart(item.id)}/>
                         </CardProduct>  
                     ))}
                 </div>
                 <div className="w-2/6">
                     <h1 className="text-3xl font-bold text-blue-600 ml-5 mb-2">Cart</h1>
-                    <table className="text-left table-auto border-separate border-spacing-x-2">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {products.length > 0 && cart.map((item) => {
-                                const product = products.find((product) => product.id === item.id)
-                                return (
-                                    <tr key={item.id}>
-                                        <td>{product!.title}</td>
-                                        <td>
-                                            {product!.price.toLocaleString('id-ID', {
-                                                style: 'currency', 
-                                                currency: 'USD'
-                                            })}
-                                        </td>
-                                        <td>{item.qty}</td>
-                                        <td>
-                                            {(item.qty * product!.price).toLocaleString('id-ID', { 
-                                                style: 'currency', 
-                                                currency: 'USD' 
-                                            })}
-                                        </td>
-                                    </tr>
-                                )
-                            })}
-                            <tr ref={totalPriceRef}>
-                                <td colSpan={3}><b>Total Price</b></td>
-                                <td>
-                                    <b>{totalPrice.toLocaleString('id-ID', {
-                                        style: 'currency', 
-                                        currency: 'USD'
-                                    })}</b>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <TableCart products={products} />
                 </div>
             </div>
         </>
